@@ -1,0 +1,90 @@
+﻿USE master;
+GO
+
+IF NOT EXISTS (SELECT name FROM sys.databases WHERE name = 'B2BWholesaleDB')
+BEGIN 
+	CREATE DATABASE B2BWholesaleDB;
+END
+GO
+
+--SET UP DATABASE--
+USE B2BWholesaleDB;
+GO
+
+CREATE TABLE Item(
+	ItemID INT IDENTITY(1,1),
+	ItemName NVARCHAR(100) NOT NULL,
+	Size NVARCHAR(50) NULL,
+	Price DECIMAL(18,2) NOT NULL,
+	StockQuantity INT NOT NULL,
+
+	CONSTRAINT PK_Item PRIMARY KEY (ItemID),
+	CONSTRAINT CK_Item_Price CHECK (Price >= 0),
+	CONSTRAINT CK_Item_Stock CHECK (StockQuantity >= 0)
+);
+GO
+
+CREATE TABLE Agent(
+	AgentID INT IDENTITY(1,1),
+	AgentName NVARCHAR(100) NOT NULL,
+	Address NVARCHAR(255) NOT NULL,
+	Phone NVARCHAR(20) NOT NULL,
+
+	CONSTRAINT PK_Agent PRIMARY KEY (AgentID),
+	CONSTRAINT UQ_Agent_Phone UNIQUE (Phone)
+);
+GO
+
+CREATE TABLE [Order] (
+	OrderID INT IDENTITY(1,1),
+	OrderDate DATETIME NOT NULL CONSTRAINT DF_Order_Date DEFAULT GETDATE(),
+	AgentID INT NOT NULL,
+	OrderStatus NVARCHAR(50) NOT NULL CONSTRAINT DF_Order_Status DEFAULT 'Pending',
+
+	CONSTRAINT PK_Order PRIMARY KEY (OrderID),
+	CONSTRAINT FK_Order_Agent FOREIGN KEY (AgentID)
+		REFERENCES Agent(AgentID)
+		ON DELETE NO ACTION,
+	CONSTRAINT CK_Order_Status CHECK (OrderStatus IN ('Pending', 'Shipped', 'Delivered', 'Cancelled'))
+);
+GO
+
+CREATE TABLE OrderDetail (
+	ID INT IDENTITY(1,1),
+    OrderID INT NOT NULL,
+    ItemID INT NOT NULL,
+    Quantity INT NOT NULL,
+    UnitAmount DECIMAL(18,2) NOT NULL,
+
+	CONSTRAINT PK_OrderDetail PRIMARY KEY (ID),
+	CONSTRAINT FK_OrderDetail_Order FOREIGN KEY (OrderID)
+		REFERENCES [Order](OrderID)
+		ON DELETE CASCADE,
+	CONSTRAINT FK_OrderDetail_Item FOREIGN KEY (ItemID)
+		REFERENCES Item(ItemID)
+		ON DELETE NO ACTION,
+	CONSTRAINT CK_OrderDetail_Qty CHECK (Quantity > 0),
+	CONSTRAINT CK_OrderDetail_Amount CHECK (UnitAmount >= 0),
+	CONSTRAINT UQ_OrderDetail_Order_Item UNIQUE (OrderID, ItemID)
+);
+GO
+
+CREATE TABLE Users(
+	UserID INT IDENTITY(1,1),
+	UserName NVARCHAR(50) NOT NULL,
+	email NVARCHAR(100) NOT NULL,
+	password NVARCHAR(255) NOT NULL,
+	lock BIT NOT NULL CONSTRAINT DF_Users_Lock DEFAULT 0,
+	Role NVARCHAR(20) NOT NULL,
+
+	CONSTRAINT PK_Users PRIMARY KEY (UserID),
+	CONSTRAINT UQ_Users_UserName UNIQUE (UserName),
+	CONSTRAINT UQ_Users_Email UNIQUE (email),
+	CONSTRAINT CK_Users_Role CHECK (Role IN ('Admin', 'Agent'))
+);
+GO
+
+CREATE NONCLUSTERED INDEX IX_Order_AgentID ON [Order](AgentID);
+CREATE NONCLUSTERED INDEX IX_OrderDetail_OrderID ON OrderDetail(OrderID);
+CREATE NONCLUSTERED INDEX IX_OrderDetail_ItemID ON OrderDetail(ItemID);
+GO
