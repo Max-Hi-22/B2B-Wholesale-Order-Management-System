@@ -72,6 +72,7 @@
       <DependentUpon>B2BModel.edmx</DependentUpon>
     </Compile>
     <Compile Include="Class1.cs" />
+    <Compile Include="DTOs\DashboardDTOs.cs" />
     <Compile Include="Item.cs">
       <DependentUpon>B2BModel.tt</DependentUpon>
     </Compile>
@@ -117,6 +118,7 @@
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
