@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="f2f13c8c9d79415c898b8d548b4724e4" Name="Diagram1">
+        <EntityTypeShape EntityType="B2BWholesaleDBModel.Agent" Width="1.5" PointX="0.75" PointY="1.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="B2BWholesaleDBModel.Item" Width="1.5" PointX="3" PointY="5" IsExpanded="true" />
+        <EntityTypeShape EntityType="B2BWholesaleDBModel.Order" Width="1.5" PointX="3" PointY="1" IsExpanded="true" />
+        <EntityTypeShape EntityType="B2BWholesaleDBModel.OrderDetail" Width="1.5" PointX="5.25" PointY="1" IsExpanded="true" />
+        <EntityTypeShape EntityType="B2BWholesaleDBModel.User" Width="1.5" PointX="6.875" PointY="5.125" IsExpanded="true" />
+        <AssociationConnector Association="B2BWholesaleDBModel.FK_Order_Agent" ManuallyRouted="false" />
+        <AssociationConnector Association="B2BWholesaleDBModel.FK_OrderDetail_Item" ManuallyRouted="false" />
+        <AssociationConnector Association="B2BWholesaleDBModel.FK_OrderDetail_Order" ManuallyRouted="false" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>
