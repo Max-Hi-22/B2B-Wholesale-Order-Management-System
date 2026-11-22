@@ -69,29 +69,33 @@
             // 
             // txtUsername
             // 
+            this.txtUsername.Font = new System.Drawing.Font("Segoe UI", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtUsername.Location = new System.Drawing.Point(314, 315);
             this.txtUsername.Name = "txtUsername";
-            this.txtUsername.Size = new System.Drawing.Size(420, 22);
+            this.txtUsername.Size = new System.Drawing.Size(420, 31);
             this.txtUsername.TabIndex = 3;
             // 
             // txtPassword
             // 
+            this.txtPassword.Font = new System.Drawing.Font("Segoe UI", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtPassword.Location = new System.Drawing.Point(314, 400);
             this.txtPassword.Name = "txtPassword";
-            this.txtPassword.PasswordChar = '*';
-            this.txtPassword.Size = new System.Drawing.Size(420, 22);
+            this.txtPassword.Size = new System.Drawing.Size(420, 31);
             this.txtPassword.TabIndex = 4;
             this.txtPassword.UseSystemPasswordChar = true;
             // 
             // chkShowPassword
             // 
+            this.chkShowPassword.AutoSize = true;
+            this.chkShowPassword.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.chkShowPassword.Font = new System.Drawing.Font("Segoe UI", 11F);
             this.chkShowPassword.Location = new System.Drawing.Point(314, 445);
             this.chkShowPassword.Name = "chkShowPassword";
-            this.chkShowPassword.Size = new System.Drawing.Size(200, 45);
+            this.chkShowPassword.Size = new System.Drawing.Size(161, 29);
             this.chkShowPassword.TabIndex = 5;
             this.chkShowPassword.Text = "Show password";
             this.chkShowPassword.UseVisualStyleBackColor = true;
+            this.chkShowPassword.CheckedChanged += new System.EventHandler(this.chkShowPassword_CheckedChanged);
             // 
             // btnExit
             // 
