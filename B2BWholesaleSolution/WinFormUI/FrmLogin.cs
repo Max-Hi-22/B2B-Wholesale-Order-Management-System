@@ -27,7 +27,7 @@ namespace WinFormUI
             txtPassword.UseSystemPasswordChar = !chkShowPassword.Checked;
         }
 
-        private void btnLogin_Click(object sender, EventArgs e)
+        private void btnLogin_Click_1(object sender, EventArgs e)
         {
             try
             {
@@ -46,10 +46,11 @@ namespace WinFormUI
                 );
 
                 this.Hide();
-                //using (var frmMain = new FrmMain())
-                //{
-                //    frmMain.ShowDialog();
-                //}
+                using (var frmMain = new FrmMain())
+                {
+                    frmMain.StartPosition = FormStartPosition.CenterScreen;
+                    frmMain.ShowDialog();
+                }
 
                 if (!SessionManager.IsLoggedIn)
                 {
@@ -65,7 +66,8 @@ namespace WinFormUI
             catch (ArgumentException ex)
             {
                 MessageBox.Show(
-                    ex.Message, "Miss information", MessageBoxButtons.OK, MessageBoxIcon.Warning
+                    ex.Message, "Miss information", 
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning
                 );
             }
             catch (UnauthorizedAccessException ex)
@@ -90,15 +92,18 @@ namespace WinFormUI
             }
         }
 
+        private void FrmLogin_Load(object sender, EventArgs e)
+        {
+            txtUsername.Focus();
+        }
+
+        private void btnExit_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
+        }
         private void lblTitle_Click(object sender, EventArgs e)
         {
 
         }
-
-        private void FrmLogin_Load(object sender, EventArgs e)
-        {
-
-        }
-
     }
 }
