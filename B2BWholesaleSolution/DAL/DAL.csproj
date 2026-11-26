@@ -71,8 +71,8 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>B2BModel.edmx</DependentUpon>
     </Compile>
-    <Compile Include="Class1.cs" />
     <Compile Include="DTOs\DashboardDTOs.cs" />
+    <Compile Include="DTOs\ShippingManifestDTO.cs" />
     <Compile Include="Item.cs">
       <DependentUpon>B2BModel.tt</DependentUpon>
     </Compile>
