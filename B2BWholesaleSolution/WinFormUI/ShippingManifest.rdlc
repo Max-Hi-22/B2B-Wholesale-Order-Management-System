@@ -1059,7 +1059,11 @@
       </Textbox>
     </ReportItems>
     <Height>5.5in</Height>
-    <Style />
+    <Style>
+      <Border>
+        <Style>None</Style>
+      </Border>
+    </Style>
   </Body>
   <Width>7.4in</Width>
   <Page>
