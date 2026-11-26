@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -11,6 +12,7 @@ using System.Windows.Forms;
 using BLL.Services;
 using DAL;
 using WinFormUI.Utils;
+using Microsoft.Reporting.WinForms;
 
 namespace WinFormUI
 {
@@ -214,13 +216,52 @@ namespace WinFormUI
                     return;
                 }
 
-                using (var frmReport = new FrmReportViewer(manifestData))
-                    frmReport.ShowDialog();
+                using (var sfd = new SaveFileDialog())
+                {
+                    sfd.Title = "Save Shipping Manifest PDF";
+                    sfd.Filter = "PDF Files (*.pdf)|*.pdf";
+                    sfd.FileName = $"ShippingManifest_Order_.pdf";
+
+                    if (sfd.ShowDialog() != DialogResult.OK)
+                        return;
+
+                    using (var report = new LocalReport())
+                    {
+                        report.ReportEmbeddedResource = "WinFormUI.ShippingManifest.rdlc";
+                        report.DataSources.Clear();
+                        report.DataSources.Add(
+                            new ReportDataSource("ManifestDataSet", manifestData));
+
+                        byte[] pdfBytes = report.Render("PDF");
+                        File.WriteAllBytes(sfd.FileName, pdfBytes);
+                    }
+
+                    var openResult = MessageBox.Show(
+                        "Export successfully! Confirm to open PDF file?",
+                        "Export successfully",
+                        MessageBoxButtons.YesNo,
+                        MessageBoxIcon.Question);
+
+                    if (openResult == DialogResult.Yes)
+                        Process.Start(new ProcessStartInfo(sfd.FileName)
+                        {
+                            UseShellExecute = true
+                        });
+                }
+            }
+            catch (InvalidOperationException ex)
+            {
+                MessageBox.Show(ex.Message, "Alert!",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error exporting Shipping Manifest: " + ex.Message, 
-                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                string detail = ex.InnerException?.InnerException?.Message
+                    ?? ex.InnerException?.Message
+                    ?? ex.Message;
+                MessageBox.Show(
+                    "Error exporting PDF Shipping Manifest:\n" + detail, "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
         private void cboFilterStatus_SelectedIndexChanged_1(object sender, EventArgs e)

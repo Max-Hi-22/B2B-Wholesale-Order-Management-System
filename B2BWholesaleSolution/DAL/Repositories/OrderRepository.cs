@@ -32,6 +32,14 @@ namespace DAL.Repositories
                 .FirstOrDefault(o => o.OrderID == orderId);
         }
 
+        public Order GetOrderByIdWithDetails(int orderId)
+        {
+            return _context.Orders
+                .Include(o => o.Agent)
+                .Include(o => o.OrderDetails.Select(d => d.Item))
+                .FirstOrDefault(o => o.OrderID == orderId);
+        }
+
         public List<OrderDetail> GetOrderDetails(int orderId)
         {
             return _context.OrderDetails

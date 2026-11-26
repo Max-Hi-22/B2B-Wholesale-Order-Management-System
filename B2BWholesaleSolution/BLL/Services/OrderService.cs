@@ -74,6 +74,12 @@ namespace BLL.Services
             if (order == null)
                 throw new KeyNotFoundException($"Not found #{orderId}.");
 
+            if (string.Equals(order.OrderStatus, "Cancelled",
+                StringComparison.OrdinalIgnoreCase))
+            {
+                throw new InvalidOperationException("Cannot export shipping manifest for item.");
+            }
+
             return order.OrderDetails.Select(d => new DAL.DTOs.ShippingManifestDTO
             {
                 OrderID = order.OrderID,
