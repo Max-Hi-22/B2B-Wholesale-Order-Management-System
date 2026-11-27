@@ -22,10 +22,5 @@ namespace AgentPortalWeb.Models
 
         [Required, StringLength(20)]
         public string Role { get; set; } = "Agent";
-
-        public int? AgentID { get; set; }
-
-        [ForeignKey("AgentID")]
-        public virtual Agent? Agent { get; set; }
     }
 }
