@@ -1,0 +1,137 @@
+﻿@model AgentPortalWeb.Models.Order
+@{
+    Layout = null;
+    decimal grandTotal = Model.OrderDetails?.Sum(d => d.UnitAmount) ?? 0m;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Invoice #@Model.OrderID - B2B Wholesale</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+            body {
+                background-color: #f8f9fa;
+            }
+
+            .invoice-box {
+                max-width: 850px;
+                margin: 30px auto;
+                padding: 40px;
+                background: #fff;
+                border: 1px solid #dee2e6;
+                box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
+            }
+
+            @@media print {
+                body {
+                    background-color: #fff;
+                }
+
+                .invoice-box {
+                    margin: 0;
+                    padding: 15px;
+                    border: none;
+                    box-shadow: none;
+                    max-width: 100%;
+                }
+
+                .no-print {
+                    display: none !important;
+                }
+            }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Thanh công cụ chỉ hiện trên màn hình, ẩn khi in -->
+        <div class="d-flex justify-content-between align-items-center my-3 no-print" style="max-width: 850px; margin: 20px auto;">
+            <a href="javascript:window.close();" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-1"></i>Close Tab
+            </a>
+            <button onclick="window.print()" class="btn btn-primary fw-bold">
+                <i class="bi bi-printer-fill me-1"></i>Print / Save as PDF
+            </button>
+        </div>
+
+        <div class="invoice-box">
+            <!-- Header Hóa đơn -->
+            <div class="row border-bottom pb-3 mb-4">
+                <div class="col-6">
+                    <h3 class="fw-bold text-primary mb-1">B2B WHOLESALE CO.</h3>
+                    <p class="text-muted small mb-0">19 Nguyen Huu Tho, District 7, HCMC</p>
+                    <p class="text-muted small mb-0">Hotline: 1900-2026 | Tax ID: 0312345678</p>
+                </div>
+                <div class="col-6 text-end">
+                    <h2 class="fw-bold text-dark mb-1">INVOICE</h2>
+                    <p class="mb-0"><strong>Order ID:</strong> #@Model.OrderID</p>
+                    <p class="mb-0"><strong>Date:</strong> @Model.OrderDate.ToString("dd/MM/yyyy HH:mm")</p>
+                    <p class="mb-0"><strong>Status:</strong> @Model.OrderStatus</p>
+                </div>
+            </div>
+
+            <!-- Thông tin Đại lý nhận hàng -->
+            <div class="mb-4">
+                <h6 class="text-uppercase text-muted fw-bold mb-2">Bill To (Distributor Agent):</h6>
+                <div class="p-3 bg-light rounded border">
+                    <h5 class="fw-bold mb-1">@Model.Agent?.AgentName</h5>
+                    <p class="mb-1"><i class="bi bi-geo-alt me-1"></i><strong>Address:</strong> @Model.Agent?.Address</p>
+                    <p class="mb-0"><i class="bi bi-telephone me-1"></i><strong>Phone:</strong> @Model.Agent?.Phone</p>
+                </div>
+            </div>
+
+            <!-- Bảng chi tiết hàng hóa -->
+            <table class="table table-bordered align-middle mb-4">
+                <thead class="table-light">
+                    <tr>
+                        <th class="text-center" style="width: 50px;">No.</th>
+                        <th>Item Description</th>
+                        <th class="text-center">Size</th>
+                        <th class="text-end">Unit Price</th>
+                        <th class="text-center">Qty</th>
+                        <th class="text-end">Line Total (VND)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        int stt = 1;
+                    }
+                    @foreach (var detail in Model.OrderDetails)
+                    {
+                        decimal unitPrice = detail.Item?.Price ?? 0m;
+                        <tr>
+                            <td class="text-center">@stt</td>
+                            <td class="fw-semibold">@detail.Item?.ItemName</td>
+                            <td class="text-center">@detail.Item?.Size</td>
+                            <td class="text-end">@unitPrice.ToString("N0")</td>
+                            <td class="text-center">@detail.Quantity</td>
+                            <td class="text-end fw-semibold">@detail.UnitAmount.ToString("N0")</td>
+                        </tr>
+                        stt++;
+                    }
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th colspan="5" class="text-end fs-5">GRAND TOTAL:</th>
+                        <th class="text-end fs-5 text-primary">@grandTotal.ToString("N0") VND</th>
+                    </tr>
+                </tfoot>
+            </table>
+
+            <!-- Chữ ký -->
+            <div class="row text-center mt-5 pt-4">
+                <div class="col-6">
+                    <p class="fw-bold mb-5">Authorized Distributor</p>
+                    <p class="text-muted small">(Signature & Stamp)</p>
+                </div>
+                <div class="col-6">
+                    <p class="fw-bold mb-5">Agent Representative</p>
+                    <p class="text-muted small">(Signature & Full Name)</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
