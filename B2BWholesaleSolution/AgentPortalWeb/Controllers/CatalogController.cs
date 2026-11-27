@@ -66,10 +66,30 @@ namespace AgentPortalWeb.Controllers
                 return RedirectToAction("Index");
             }
 
-            // DATABASE TRANSACTION: Tạo Order + OrderDetails + Trừ StockQuantity
+            // DATABASE TRANSACTION: Kiểm tra tồn kho toàn bộ trước -> Tạo Order + OrderDetails + Trừ StockQuantity
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
+                // 1. Kiểm tra tồn kho TẤT CẢ sản phẩm trước khi lưu bất kỳ bản ghi nào
+                var validatedItems = new List<(Item DbItem, int Qty)>();
+                foreach (var input in selectedItems)
+                {
+                    var dbItem = await _context.Items.FirstOrDefaultAsync(i => i.ItemID == input.ItemID);
+                    if (dbItem == null)
+                        throw new InvalidOperationException($"Item ID #{input.ItemID} doesn't exist.");
+
+                    if (dbItem.StockQuantity < input.Quantity)
+                    {
+                        throw new InvalidOperationException(
+                            $"Not enough stock inventory for '{dbItem.ItemName}' " +
+                            $"(Order: {input.Quantity}, Inventory: {dbItem.StockQuantity}). " +
+                            $"Order cancelled.");
+                    }
+
+                    validatedItems.Add((dbItem, input.Quantity));
+                }
+
+                // 2. Khi tất cả sản phẩm đều đủ hàng -> Mới tạo Order, OrderDetails và trừ tồn kho
                 var newOrder = new Order
                 {
                     AgentID = agentId,
@@ -79,29 +99,16 @@ namespace AgentPortalWeb.Controllers
                 _context.Orders.Add(newOrder);
                 await _context.SaveChangesAsync();
 
-                foreach (var input in selectedItems)
+                foreach (var (dbItem, qty) in validatedItems)
                 {
-                    var dbItem = await _context.Items.FirstOrDefaultAsync(i => i.ItemID == input.ItemID);
-                    if (dbItem == null)
-                        throw new InvalidOperationException(
-                            $"Item ID #{input.ItemID} doesn't exist.");
-
-                    if (dbItem.StockQuantity < input.Quantity)
-                    {
-                        throw new InvalidOperationException(
-                            $"Not enough stock inventory for '{dbItem.ItemName}' " +
-                            $"(Order: {input.Quantity}, Inventory: {dbItem.StockQuantity}). " +
-                            $"Display order.");
-                    }
-
-                    dbItem.StockQuantity -= input.Quantity;
+                    dbItem.StockQuantity -= qty;
 
                     _context.OrderDetails.Add(new OrderDetail
                     {
                         OrderID = newOrder.OrderID,
                         ItemID = dbItem.ItemID,
-                        Quantity = input.Quantity,
-                        UnitAmount = input.Quantity * dbItem.Price
+                        Quantity = qty,
+                        UnitAmount = qty * dbItem.Price
                     });
                 }
 
