@@ -1,0 +1,91 @@
+﻿@model List<AgentPortalWeb.Models.Order>
+@{
+    ViewData["Title"] = "My Orders";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h3 class="fw-bold text-primary mb-0"><i class="bi bi-receipt-cutoff me-2"></i>Order History</h3>
+    <a asp-controller="Catalog" asp-action="Index" class="btn btn-primary">
+        <i class="bi bi-plus-circle me-1"></i>New Order
+    </a>
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i>@TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<!-- Bộ lọc đơn hàng theo Đại lý -->
+<div class="card shadow-sm border-0 mb-3">
+    <div class="card-body py-2">
+        <form method="get" asp-action="MyOrders" class="row g-2 align-items-center">
+            <div class="col-auto">
+                <label class="fw-semibold"><i class="bi bi-funnel me-1"></i>Filter by Agent:</label>
+            </div>
+            <div class="col-md-5">
+                <select name="agentId" asp-items="ViewBag.Agents" class="form-select" onchange="this.form.submit()">
+                    <option value="">-- All Agents --</option>
+                </select>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th class="ps-3">Order ID</th>
+                        <th>Order Date</th>
+                        <th>Agent Name</th>
+                        <th class="text-center">Items Count</th>
+                        <th class="text-end">Total Amount (VND)</th>
+                        <th class="text-center">Status</th>
+                        <th class="text-center pe-3">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center py-4 text-muted">No orders found.</td>
+                        </tr>
+                    }
+                    @foreach (var order in Model)
+                    {
+                        decimal orderTotal = order.OrderDetails?.Sum(d => d.UnitAmount) ?? 0m;
+                        string badgeClass = order.OrderStatus switch
+                        {
+                            "Pending" => "bg-warning text-dark",
+                            "Shipped" => "bg-info text-dark",
+                            "Delivered" => "bg-success",
+                            "Cancelled" => "bg-danger",
+                            _ => "bg-secondary"
+                        };
+
+                        <tr>
+                            <td class="ps-3 fw-bold">#@order.OrderID</td>
+                            <td>@order.OrderDate.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td>@order.Agent?.AgentName</td>
+                            <td class="text-center">@order.OrderDetails?.Count</td>
+                            <td class="text-end fw-bold text-primary">@orderTotal.ToString("N0")</td>
+                            <td class="text-center">
+                                <span class="badge @badgeClass">@order.OrderStatus</span>
+                            </td>
+                            <td class="text-center pe-3">
+                                <a asp-action="Invoice" asp-route-id="@order.OrderID" target="_blank" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-printer me-1"></i>Print Invoice
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
