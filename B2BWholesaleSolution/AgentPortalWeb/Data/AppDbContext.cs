@@ -34,7 +34,7 @@ namespace AgentPortalWeb.Data
 
             modelBuilder.Entity<OrderDetail>()
                 .HasOne(od => od.Item)
-                .WithMany(i => i.OrderDetail)
+                .WithMany(i => i.OrderDetails)
                 .HasForeignKey(od => od.ItemID)
                 .OnDelete(DeleteBehavior.Restrict);
         }
